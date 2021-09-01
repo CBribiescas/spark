@@ -211,10 +211,32 @@ private[ml] trait TreeClassifierParams extends Params {
     (value: String) =>
       TreeClassifierParams.supportedImpurities.contains(value.toLowerCase(Locale.ROOT)))
 
-  setDefault(impurity -> "gini")
+  /**
+   * If true, the trained tree will undergo a 'pruning' process after training in which nodes
+   * that have the same class predictions will be merged.  This drawback means that the class
+   * probabilities will be lost.  The benefit being that at prediction time the tree will be
+   * smaller and have faster predictions
+   * If false, the post-training tree will undergo no pruning.  The benefit being that you
+   * maintain the class prediction probabilities
+   * (default = true)
+   * @group param
+   */
+  final val pruneTree: BooleanParam = new BooleanParam(this, "pruneTree", "" +
+    "If true, the trained tree will undergo a 'pruning' process after training in which nodes" +
+    " that have the same class predictions will be merged.  This drawback means that the class" +
+    " probabilities will be lost.  The benefit being that at prediction time the tree will be" +
+    " smaller and have faster predictions" +
+    " If false, the post-training tree will undergo no pruning.  The benefit being that you" +
+    " maintain the class prediction probabilities"
+  )
+
+  // HERE
+  setDefault(impurity -> "gini", pruneTree -> true)
 
   /** @group getParam */
   final def getImpurity: String = $(impurity).toLowerCase(Locale.ROOT)
+  /** @group getParam */
+  final def getPruneTree: Boolean = $(pruneTree)
 
   /** Convert new impurity to old impurity. */
   private[ml] def getOldImpurity: OldImpurity = {
